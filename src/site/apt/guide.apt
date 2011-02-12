@@ -1,0 +1,177 @@
+  ------
+  User Guide
+  
+User Guide  
+
+  The user guide describes in short what steps are necessary to install, configure and use e2etrace
+  in your application.	
+  
+* Prerequisites
+
+  e2etrace has been tested using JDK 1.4, JDK 1.5 and JDK 1.6. It should work fine with older JDKs, too, but I´ve
+  not verified that. If you´re using a JDK before 1.5 e2etrace will use <<<System.currentTimeMillis()>>> 
+  to measure the execution times of single trace steps. Under Windows, <<<currentTimeMillis()>>> 
+  will typically provide an accuracy of about 10ms, which is too coarse for measuring short intervals 
+  (for details on this issue, please refer to the article 
+  {{{http://www.javaworld.com/javaworld/javaqa/2003-01/01-qa-0110-timing.html}My kingdom for a good timer!}}).
+  Beginning with version 1.5 the JDK offers with <<<System.nanoTime()>>> a better method for measuring time intervals that works accurate 
+  on all operating systems. To be exact: This method guarantees the accuracy the operating system is able to deliver. 
+  In most to all cases this should be about 1-2ms. e2etrace will automatically use <<<System.nanoTime()>>> if it 
+  is available in the JDK. 
+  
+  The binary distribution of e2etrace requires the commons-logging framework (V1.1). If you want 
+  to compile e2etrace yourself from the source code distribution you´ll need to install Maven 2.x, 
+  since this great tool is the basis for the build process. 
+
+* Installation
+
+  To use e2etrace in your applications, just unzip the binary distribution archive and add 
+  <<<e2etrace-1.4.2.jar>>> to your classpath (Note for Maven users:
+  I´m planning to upload e2etrace to ibiblio in the future. For now, you have to install the e2etrace jar file to 
+  your local repository manually).
+    
+* Configuration
+
+  There is no need to configure e2etrace if you just want to collect trace data during the 
+  development of your system. However, as soon as your application is used in a productive 
+  environment you´ll probably want to turn of e2etrace if it is not really needed. To accomplish
+  this you´ll need to create a properties file like the following:
+  
+----------------------------
+# e2etrace configuration
+global.enabletrace=true
+global.reloadinterval=5
+
+# Turn on/off single trace ids
+id.$EjbTestRunnerBean=true
+id.ProxyTestRunner#run=false
+----------------------------
+
+  The setting <<<global.enabletrace>>> determines, if e2etrace will collect trace data or not. If you
+  specify <<<false>>> e2etrace is completely disabled. If <<<global.reloadinterval>>> is defined in the
+  configuration file, the property file will be automatically reloaded every <<<n>>> seconds. If no reload
+  interval or an interval of 0 seconds is defined, the configuration will only be loaded once.
+  
+  If <<<global.enabletrace>>> is set to <<<true>>> you may selectively disable single trace steps. This
+  is done by adding <<<id.<tracestepid>>>> entries to the configuration file (I´ll explain the details about
+  the trace step id in the next section). If you disable a single trace step id, no trace data will collected
+  for this step. If you disable a complete trace session (trace session ids use a dollar sign as prefix to 
+  separate them from normal trace ids), no trace data will be collected for
+  all steps that belong to this session. The default value for trace ids is true. That is, if no ids are 
+  defined in the configuration file, tracing will be enabled for all trace steps. 
+  
+  The easiest way to load a configuration file is to define the property <<<e2etrace.configuration>>> 
+  at the startup of the application. For example, if <<<-De2etrace.configuration=e2etrace.properties>>> is 
+  passed to the JDK that executes the application, the file <<<e2etrace.properties>>> will be loaded from
+  the classpath. Alternatively you can use the e2etrace API to load a configuration file at runtime (for
+  details, please refer to the JavaDoc).
+
+* Collecting trace data 
+
+  To actually start collecting trace data just follow these steps:
+  
+  * Add <<<enterStep>>> and <<<leaveStep>>> calls to all methods of your application that you wish to monitor
+  using e2etrace
+  
+  * Initialize e2etrace at the beginning of a trace session. In "normal" applications there is only one sessions
+  that normally starts in the <<<main>>> method. In Java EE applications all services invoked by remote clients
+  are sessions by their own (e.g. Session Beans, Servlets).
+  
+  * Print the trace data to a file when the trace session ends. Alternatively you may wish to return the trace
+  data to a remote client.
+  
+  Lets take a look at the details for each of those steps.
+  
+** Instrumenting the code 
+  
+  The main effort is to instrument your code using 
+  <<<enterStep>>> and <<<leaveStep>>> calls:
+  
+-------------------
+ public class EjbUtil {
+    private static final ITraceSessionManager tsm = ThreadedTraceSessionManager.getInstance();  
+  
+    ...  
+    
+    public EjbTestRunner createTestRunnerEjb()      
+      tsm.getCurrentSession().enterStep(new MethodTraceStepId("EjbUtil", "createTestRunnerEjb"));
+      
+      ...
+      
+      tsm.getCurrentSession().leaveStep(new MethodTraceStepId("EjbUtil", "createTestRunnerEjb"));
+      
+    }
+  
+  } 
+-------------------
+ 
+  In every class that uses e2etrace you must declare a <<<private static final>>> attribute that references the
+  so-called <trace session manager>. The above example assumes that the code is running in an application server
+  environment so the <<<ThreadedTraceSessionManager>>> is used. This class is able to maintain one trace session
+  per worker thread of the app server. In each method of the class the trace session manager is used to retrieve
+  the current trace session. The trace session finally allows to collect trace data using <<<enterStep>>> and
+  <<<leaveStep>>>. <<<enterStep>>> expects a unique trace step id as parameter. The same id must be passed to
+  <<<leaveStep>>> when the method ends. Internally, e2etrace uses the id to calculate the execution time of a
+  trace step. You must make sure that the id really uniquely identifies a method. The easiest way to accomplish
+  this is to use the class <<<MethodTraceStepId>>> as shown in the example. This class expects the name of the
+  current class and the current method as parameters. You can enable or disable a <<<MethodTraceStepId>>> in the
+  e2etrace configuration file by using the pattern <<<classname#methodname>>>.
+
+** Initializing the trace session
+
+  To initialize a trace session the following code is required:
+  
+-------------------
+ ITraceSession ts = new DefaultTraceSession("EjbTestRunnerBean",
+       new DefaultTraceStepFactory());
+ ITraceSessionManager tsm = ThreadedTraceSessionManager.getInstance();
+
+ tsm.setCurrentSession(ts);
+-------------------
+
+ In the example the trace session is initialized using <<<EjbTestRunnerBean>>> as session id. You can use this id to
+ enable or disable trace sessions in the configuration file (just remember to add a dollar sign as prefix, e.g.
+ <<<$EjbTestRunnerBean>>>).
+ 
+ As I´ve mentioned before you´ll need just one trace session in "normal" Java application. In Java EE systems 
+ the above code must be added to every Session Bean, servlet or any other class that represents a remote service.
+
+* Retrieving trace data from remote trace sessions
+
+ To get the most out of e2etrace you should use the possibility to add trace trees from remote service calls to
+ the trace tree of your local client application. A prequisite for this is, of course, to pass the trace tree 
+ from the remote service to the caller. If you´re using response objects to capsule the result values of 
+ remote service it is quite easy to extend those classes by a new attribute for the trace tree. If you don´t use
+ request/response classes now, you should consider using them in the future, anyway :).
+ 
+ To pass the trace tree of a service to the caller, all you need to do is to send back the <root step> of the
+ trace session:
+ 
+--------------------
+Response resp = new Response();
+
+resp.setTrace( tsm.getCurrentSession().getRootStep() );
+--------------------
+
+ Back in the caller, you must now add the trace tree of the remote service to the one of your client application:
+ 
+--------------------
+response = service.execute();
+
+tsm.getCurrentSession().getCurrentStep().addChild(response.getTrace());
+-------------------- 
+
+* Writing the trace tree to a file
+
+ Now you´re ready to write the complete trace tree of your client app and all remote service to an output stream.
+ e2etrace offers a number of different trace formatters to write the trace tree in a given format to an output stream. For 
+ example, the following code prints the trace tree to the console:
+ 
+-------------------- 
+formatter = new PlainTextTraceFormatter();
+output = new StringWriter();
+
+formatter.format(ThreadedTraceSessionManager.getInstance().getCurrentSession(), output);
+
+System.out.println(output.toString());
+-------------------- 

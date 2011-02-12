@@ -1,0 +1,145 @@
+  ------
+  Overview
+  
+Overview
+
+  e2etrace offers you the abilty to monitor the execution of your application using a mechanism called
+  <<tracing>>. Basically this means that every execution step of your system is monitored and documented. 
+  If your system doesn´t behave like expected the monitored trace steps help you understand what´s going on.
+
+* Classical tracing approach
+
+  The classical approach to implement tracing is to simply add log statements 
+  like the following to your source code:
+  
+------------------
+public void doSometing() {
+  log.debug(">>> Entering doSomething()");
+  
+  ...
+  
+  log.debug("<<< Leaving doSomething()");
+
+}
+------------------
+
+  You´ll probably want to refactor the trace calls to a dedicated class and
+  add some additional value, like the measurement of execution time. In fact, that´s what I´ve done
+  for years. However, this approach has serious disadvantages.
+  
+* Disadvantages of the classical approach
+  
+  If you need to inspect a trace log to track down for example a performance problem in your application
+  you´re typically not interested in <<all>> trace statements, but only in the trace statements of the
+  problematic function of your system. This function, I´ll call it a <<service>> your application offers
+  from now on, is implemented by a number of Java methods that call each other. The methods calls, or
+  execution steps, build the <<trace tree>> of a service call. This trace tree is the first thing to 
+  look at, if you need to understand a questionable service.
+  
+  In practice it is far from easy to extract such a trace tree from one giant log file that contains all
+  trace statements of your application. Let´s say, for example, your application uses a common set of base
+  functionality implemented in a core library. The classes and methods in this library will be involved in
+  nearly every service of your application. In consequence you´ll find a tremendous amount of trace
+  statements in your log file that have been created by the core library. There is no easy way to isolate
+  exactly the statements that belong to the execution of the service that needs further inspection. Things
+  get worse when your system runs in a distributed environment. In this case, you end up with a bunch of log
+  files on different servers.
+  
+  Instead of struggling with a load of different files it would be great to simply receive the trace tree as
+  part of the response of the service. This tree should contain all execution steps from the distributed
+  components and should provide some kind of output functionality to document the whole stuff in a single,
+  easy accesible file. Of course, this trace functionality should only be enabled on demand and selectively
+  for single services to minimize overhead for the overall system.
+  
+* Where e2etrace started
+
+  Sadly, until last year I never had time to implement my idea of a new tracing approach. Then, starting
+  in August 2005, I took a year off to take care of my son (the German word is "Elternzeit", not sure if
+  an English translation exists :)). Besides changing nappies I wrote a book on software configuration management
+  using Subversion, Maven and Redmine (see {{http://www.km-buch.de}}). The book describes a very pragmatic
+  SCM aproach and is full of examples. Hence, I needed some piece of code to explain how to get a project up and
+  running with the mentioned tools. I jumped at the chance and started implementing a trace framework. 
+  Since it´s focused at end-to-end tracing of services over multiple, distributed components I named it <<e2etrace>>.
+  
+* Basic concepts of e2etrace
+
+  The design of e2etrace is based on the following abstractions:
+  
+  * <Trace steps>: Every monitored step during the execution of a service call is represented by a trace step. Typically, 
+  each method in your code is a trace step. Trace steps maintain a list of children (i.e. calls to other methods) and a 
+  reference to a parent (i.e. the caller of the current method). All trace steps together form the <trace tree>.
+  
+  * <Timers>: Each trace step is connected to a timer instance. The trace step uses the timer to measure the execution
+  time of a trace step.
+  
+  * <Trace sessions>: A trace session manages all trace steps for a single service call. IOW, a trace session represents
+  the execution of a service in your application.
+  
+  * <Trace session managers>: You need a reference to the current trace session to monitor trace steps. A trace session 
+  manager maintains all active trace sessions. It implements the singleton pattern and allows you to request the 
+  current session from anywhere in your system.  An application should only maintain a single trace session manager. However, the
+session manager may be able to administer multiple trace sessions, e.g. one for every thread of the application. 
+
+  * <Trace formatters>: Formatters traverse a tree of trace steps and generate formatted output.
+  
+  * <Trace configuration>: Maintains the settings for e2etrace. Currently the configuration is stored in property 
+  files and can be dynamically reloaded in certain intervals. In the configuration you define for which services or
+  trace steps tracing is enabled. Additionally, you may disable tracing completely, of course.
+ 
+  For details about the respective interfaces and classes, please refer to the {{{apidocs/index.html}JavaDoc documentation}}.
+ 
+* How to use it 
+ 
+  To use e2etrace in your application you need to instrument your source code:
+  
+------------------  
+
+public class EjbUtil {
+  private static final ITraceSessionManager tsm = ThreadedTraceSessionManager.getInstance();  
+
+  ...  
+  
+  public EjbTestRunner createTestRunnerEjb()      
+    tsm.getCurrentSession().enterStep(new MethodTraceStepId("EjbUtil", "createTestRunnerEjb"));
+    
+    ...
+    
+    tsm.getCurrentSession().leaveStep(new MethodTraceStepId("EjbUtil", "createTestRunnerEjb"));
+    
+  }
+
+}
+-------------------
+
+ The example shows the additional statements that are necessary to add tracing functionality to an existing
+ Java class. First, you have to define a static field that references the trace session manager.
+ In an applications server environment you´ll want to use <<<ThreadedTraceSessionManager>>>, since it is able 
+ to maintain one trace session per worker thread. Then, in the actual methods you add a call to <<<enterStep>>>
+ at the start of the method and <<<leaveStep>>> when the method ends. e2etrace is able to handle 
+ missing <<<leaveStep>>> calls, so you don´t have to worry about irregular method exits like exceptions.
+ 
+ There are some additional steps necessary to intialize e2etrace correctly, to configure it and to write
+ the actual trace data to a log file. For details, please refer to the {{{guide.html}user guide}}. When all
+ trace data has been collected, e2etrace is able to print out a trace tree like the following:
+  
+------------------  
+>> $ProxyTestRunner [Thread-2] (Total: 17940ms, Step: 0ms)
+  ProxyTestRunner#run (Total: 17940ms, Step: 0ms)
+    EjbUtil#createTestRunnerEjb (Total: 1172ms, Step: 1ms)
+      EjbUtil#createTestRunnerEjbHome (Total: 316ms, Step: 316ms)
+      EjbUtil#create (Total: 855ms, Step: 855ms)
+    ProxyTestRunner#run (Total: 16768ms, Step: 444ms)
+      >> $EjbTestRunnerBean [DefaultThreadPool 19] (Total: 16324ms, Step: 0ms)
+        EjbTestRunnerBean#run (Total: 16324ms, Step: 10ms)
+          ProxyTestRunner#run (Total: 16314ms, Step: 100ms)
+            DhrystoneTestDriver#run (Total: 16214ms, Step: 16214ms)
+------------------
+ 
+ The lines starting with <<< >> >>> mark the beginning of a trace session. In the tree shown above, you´ll notice two trace 
+ session. Since every trace session covers one service call, the above tree contains trace steps from two
+ services. The first one, <<<$ProxyTestRunner>>>, represents the client application. The client invoked a
+ second service,  <<<$EjbTestRunnerBean>>>, on a remote application server. Instead of browsing two different
+ log files for trace statements (one for the client and one for the app server) you get one combined trace 
+ tree that contains all executed trace steps. (<Note>: You need to explicitly pass the data of the remote trace session 
+ to the client and attach it to the client session to actually get such a combined trace tree. The necessary
+ steps are described in the {{{guide.html}user guide}}, too.).

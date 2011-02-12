@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="e2etrace">
+  <bannerLeft>
+    <name>e2etrace</name>
+    <src>images/e2etrace_logo.png</src>
+    <href>http://www.e2etrace.org</href>
+  </bannerLeft>
+  <!--
+  <poweredBy>
+    <logo name="Code Coverage by Clover" href="http://www.cenqua.com/clover/" img="http://www.cenqua.com/images/clovered1.gif"/>
+    <logo name="Hosted on SourceForge.net" href="http://sourceforge.net" img="http://sflogo.sourceforge.net/sflogo.php?group_id=102411&amp;type=2"/>
+    <logo name="Build with Maven 2" href="http://maven.apache.org" img="images/logos/maven-feather.png"/>
+  </poweredBy> 
+  -->
+  <body>
+    <menu name="e2etrace">
+      <item name="Welcome" href="index.html"/>
+      <item name="Overview" href="overview.html"/>
+      <item name="User Guide" href="guide.html"/>
+      <item name="FAQ" href="faq.html"/>
+      <item name="JavaDoc" href="apidocs/index.html"/>
+      <item name="Building" href="building.html"/>
+      <item name="Download" href="download.html"/>
+    </menu>
+    <menu name="Contact">
+      <item name="Impressum" href="impressum.html"/>
+    </menu>
+
+    ${reports} 
+    
+  </body>
+</project>

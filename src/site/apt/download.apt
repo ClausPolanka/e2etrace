@@ -1,0 +1,23 @@
+  ------
+  Download e2etrace
+  
+Download e2etrace
+  
+  e2etrace is available as binary and as source-code distribution. The latter does not include
+  the e2etrace jar-file, so you need to build e2etrace at least once before you can use it (details
+  about how to build e2etrace can be found {{{building.html}here}}). The binary distribution contains
+  the jar-file, the API documentation and the source code (without unit tests). However, no build
+  scripts and unit tests are included.
+  
+* Binary distribution
+
+  * Download {{{download/e2etrace-1.4.2-install.zip}e2etrace-1.4.2-install.zip}} (250 KB)
+  
+  * Download {{{download/e2etrace-1.4.2-install.tar.gz}e2etrace-1.4.2-install.tar.gz}} (100 KB)
+ 
+* Source code distribution
+
+  * Download {{{download/e2etrace-1.4.2-src.zip}e2etrace-1.4.2-src.zip}} (90 KB)
+  
+  * Download {{{download/e2etrace-1.4.2-src.tar.gz}e2etrace-1.4.2-src.tar.gz}} (50 KB)
+  

@@ -1,0 +1,36 @@
+  ------
+  Welcome to e2etrace
+  
+Welcome to e2etrace
+
+  e2etrace is a Java framework for end-to-end tracing functionality. It allows you to collect isolated
+  trace data for every service call your application processes. The trace statements are not simply
+  logged one after the other in a log-file but collected and stored in a trace tree. In contrast to
+  individual log entries in one giant log file the trace tree gives you an immediate understanding whats
+  going on in your system. The framework offers various formatters that are able to dump trace trees in
+  different formats to output streams (e.g. files, console). Additionally you may serialize trace trees
+  to remote client-applications. This allows you to track service calls that span multiple, distributed
+  components.  If you want learn more about the philosophy and concepts of e2etrace, check-out the
+  {{{overview.html}functional overview}}.
+  
+* Download
+  
+  The current release of e2etrace is V1.4.2 e2etrace is available as ready-to-use
+  install archive and as source code distribution in the {{{download.html}download area}}.
+  
+* License 
+
+  e2etrace is open source. The software is released under the
+  {{{http://www.apache.org/licenses/LICENSE-2.0}Apache License}}, Version 2.0.
+
+* Getting started
+ 
+  If you think e2etrace is worth trying out, you´ll find an explanation of how to install, configure and 
+  use it in the {{{guide.html}user guide}}.
+  
+  
+  
+  
+  
+  
+  

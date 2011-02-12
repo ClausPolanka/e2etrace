@@ -1,0 +1,33 @@
+<!-- Assembly-Deskriptor for the e2etrace install archive -->
+<assembly>
+  <id>install</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${target}</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>e2etrace-${project.version}.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${doc}</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.reporting.outputDirectory}/apidocs</directory>
+      <outputDirectory>doc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${src.java}</directory>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<faqs title="e2etrace FAQ">
+
+  <part id="about">
+    <faq>
+      <question>Why is the first public release not 1.0 but 1.4?</question>
+      <answer>
+        <p>
+          I developed e2etrace originally as an example for my book "Konfigurationsmanagement mit Subversion, 
+          Maven und Redmine" (see <a href="http://www.km-buch.de">http://www.km-buch.de</a>). As you might have guessed, 
+          the book is in German. The english title would probably be "Configuration Management using Subversion, 
+          Maven and Redmine". The book describes a pragmatic CM approach using open source tools. When I decided to 
+          write the book, I was in need of an example application to demonstrate tasks like developing the project 
+          structure, managing files using Subversion, planning and performing releases and creating developer, 
+          integration and release build scripts. Since I dislike writing useless code and I've been missing "real" 
+          tracing in Java functionality for years, I decided to finally jump at the chance and created e2etrace. 
+          The releases 1.0 to 1.3 of e2etrace are used in the book. So I decided to use 1.4 for the first public 
+          release of e2etrace.
+        </p>
+      </answer>
+    </faq>
+
+    <faq>
+      <question>Why is there only a Maven build process available for e2etrace 1.4.2?</question>
+      <answer>
+        <p>
+          In my first two editions of the book I implemented the build process for e2etrace in two variants: one using Ant and a second one 
+          using Maven. This gave the readers the opportunity to compare the functionality of both tools by 
+          their own. For the public release of e2etrace I decided to keep only the Maven build process. This is 
+          mainly due to the fact that I personally think Maven is the better tool for the job. In the 3rd edition of the book
+          I removed the Ant chapter and replaced it with a new one covering Redmine (<a href="http://www.redmine.org">http://www.redmine.org</a>).
+        </p>
+      </answer>
+    </faq>
+
+    <faq>
+      <question>I am using a logging framework to implement tracing in my application. Why should I consider to use e2etrace instead?</question>
+      <answer>
+        <p>
+          Logging and tracing are two entirely different problem domains. You should use logging intensively in 
+          your applications to ease debugging and monitor errors. However, in my experience it is not very 
+          efficient to use logging functionality to trace the execution steps of your system. You don't need
+          a zillion of isolated trace messages in one giant log file, but a trace tree that maintains
+          the hierarchical call structure of your system. e2etrace is able to create this trace tree from the
+          single execution steps of your application (to learn more, take a look at the <a href="overview.html">functional overview</a>).
+          So, just keep your favourite logging framework and use e2etrace additionally for the tracing stuff.
+        </p>
+      </answer>
+    </faq>    
+    
+  </part>
+</faqs>

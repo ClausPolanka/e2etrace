@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+ "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+ "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<!-- e2etrace: Checkstyle-Konfiguration -->
+<module name="Checker">
+  <module name="PackageHtml"/>
+  <module name="TreeWalker">
+    <module name="AbstractClassName"/>
+    <module name="TypeName">
+      <property name="format"
+                value="^I[A-Z][a-zA-Z0-9]*$"/>
+      <property name="tokens"
+                value="INTERFACE_DEF"/>
+    </module>  
+    <module name="JavadocMethod"/>
+    <module name="JavadocType"/>
+    <module name="JavadocStyle"/>
+    <module name="CyclomaticComplexity"/>
+  </module>  
+</module>

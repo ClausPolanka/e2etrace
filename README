@@ -1,0 +1,62 @@
+<!--
+
+ Copyright 2010 Gunther Popp
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+      http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+-->
+
+
+e2etrace - End-To-End Tracing
+Release 1.4.2
+http://www.e2etrace.org
+
+                              
+
+RELEASE NOTES
+=============
+
+1.4.2
+-----
+
+Release 1.4.2 fixes the following problems:
+
+* Added explicit version numbers for the checkstyle and project-info-plugins in pom.xml
+  The build was broke because of new plugin versions.
+
+
+1.4.1
+-----
+
+Release 1.4.1 has been updated to match the 3rd edition of my book on Subversion, Maven 
+and Redmine (see http://www.km-buch.de). 
+
+Additionally, the following bugs have been fixed:
+
+* CSVTraceFormatter required JDK 1.5 because writer.append() is used. The code has been changed to writer.write(), which
+  does the same job and is compatible with older JDKs.
+* TraceStep doesn't throw an IllegalStateException any more when calls to enter() and leave() do not match (e.g. when leave() is called
+  without calling enter()). Such situations are now handled gracefully and a warning message is printed to the log.
+* A number of NPEs related to NoopTraceSession have been fixed:
+   - A NoopTraceSession can now directly be assigned to a TraceSessionManager.
+   - NoopTraceSession.getConfig() does not return null anymore. Instead, a dummy config instance is returned. 
+
+
+1.4.0
+-----
+
+e2etrace 1.4.0 was the first public release of e2etrace. For details, why the first release
+has not been 1.0, please refer to the FAQ on the e2etrace homepage. 
+
+The distribution archives contain only the API documentation of e2etrace. You´ll find a 
+user guide on the e2etrace homepage.

@@ -1,0 +1,30 @@
+  ------
+  Building e2etrace from the source distribution
+
+Building e2etrace from the source distribution
+
+  You must use a JDK >= 1.5 to build e2etrace, even you plan to use e2etrace in a JDK 1.4 environment. If you
+  use JDK 1.4 to run e2etrace, the class <<<ExactTimer>>> will not work (instead, a default timer is used).
+
+  {{{http://maven.apache.org}Maven 2.x}} is required to build e2etrace from the source code distribution.
+  After you've extracted the e2etrace source archive into a directory of your choice, simply invoke the build 
+  process using the following command:
+  
+-----------------------
+mvn install
+-----------------------
+
+  This will build the e2etrace jar-file from the source code and install it into your local Maven
+  repository. If you use Maven to build your own applications, you can now reference e2etrace by adding
+  the following reference to your pom.xml:
+  
+-----------------------
+<dependency>
+  <groupId>org.e2etrace</groupId>
+  <artifactId>e2etrace</artifactId>
+  <version>1.4.2</version>
+</dependency>  
+-----------------------
+
+  If you prefer Ant or any other build tool, you'll find the generated file <<<e2etrace-1.4.2.jar>>> in the 
+  subdirectory <<<target>>>.

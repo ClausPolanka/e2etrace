@@ -1,0 +1,30 @@
+<!-- Assembly-Deskriptor for the e2etrace source install archive -->
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${doc}</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${src}</directory>
+    </fileSet>
+
+  </fileSets>
+
+</assembly>
