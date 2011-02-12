@@ -1,0 +1,311 @@
+<!-- Projektmodell fuer e2etrace -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- Allgemeine Angaben zum Projekt -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.e2etrace</groupId>
+  <artifactId>e2etrace</artifactId>
+  <packaging>jar</packaging>
+  <version>1.4.2</version>
+  <name>e2etrace-Bibliothek</name>
+  <description>End-to-end tracing for Java!</description>
+  <url>http://www.e2etrace.org</url>
+  <organization>
+    <name>Gunther Popp</name>
+    <url>http://www.e2etrace.org</url>
+  </organization>
+
+	<scm>
+		<connection>scm:svn:svn://localhost/e2etrace-project/tags/REL-1.4.2</connection>
+		<developerConnection>scm:svn:svn://localhost/e2etrace-project/tags/REL-1.4.2</developerConnection>
+	</scm>
+
+  <properties>
+    <src>src</src>
+    <target>target</target>
+    <doc>doc</doc>
+    <src.java>${src}/java</src.java>
+    <src.junit>${src}/junit</src.junit>    
+ 	<src.testdata>${src}/testdata</src.testdata>    
+    <target.java>${target}/java</target.java>
+    <target.junit>${target}/junit</target.junit>
+	<target.install>${target}/site/download</target.install>
+  </properties>
+
+  <developers>
+    <developer>
+      <id>poppgu</id>
+      <name>Gunther Popp</name>
+      <email>gpopp@km-buch.de</email>
+      <roles>
+        <role>Architect</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+  <build>
+    <sourceDirectory>${src.java}</sourceDirectory>
+    <testSourceDirectory>${src.junit}
+      </testSourceDirectory>
+    <directory>${target}</directory>
+    <outputDirectory>${target.java}</outputDirectory>
+    <testOutputDirectory>${target.junit}
+      </testOutputDirectory>
+	<testResources>
+    	<testResource>
+			<directory>${src.testdata}</directory>
+		</testResource>
+	</testResources>      
+
+    <plugins>      
+      <!-- JavaDoc-Plugin konfigurieren -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>javadoc</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+  
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+		<configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>false
+              </addMavenDescriptor>
+          </archive>
+        </configuration> 
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>assembly.xml</descriptor>
+    		<descriptor>assembly-src.xml</descriptor>            
+          </descriptors>
+     	  <outputDirectory>${target.install}</outputDirectory>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+	</plugins> 
+
+	<pluginManagement>
+	  <plugins>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.0-beta-2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2-beta-2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.0-beta-7</version>
+        </plugin>
+	  </plugins>
+	</pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.3.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1</version>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>build-int</id>   
+      <build>
+        <!--
+          Enable resource filtering for the README-file. This allows the
+          insertion of the build-number.
+        -->
+        <resources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>${basedir}/doc</directory>
+                <includes>
+                  <include>README</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <!-- Configure plugins for integration build -->
+        <plugins>   
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin
+              </artifactId>
+            <configuration>
+              <debug>false</debug>
+            </configuration>
+          </plugin>		
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+		    <configuration>
+              <testFailureIgnore>false</testFailureIgnore>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>validate</phase>
+                <goals>
+                  <goal>create</goal>
+                </goals>
+                <configuration>
+                  <useLastCommittedRevision>true</useLastCommittedRevision>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifestEntries>
+                  <Build-Number>${buildNumber}</Build-Number>
+                </manifestEntries>
+                <addMavenDescriptor>false</addMavenDescriptor>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+
+      <distributionManagement>
+         <snapshotRepository>
+           <id>nexus.snapshots.upload</id>
+           <name>Nexus-Repository for SNAPSHOTs</name>
+           <url>
+             http://localhost:8081/nexus/content/repositories/snapshots
+           </url>
+         </snapshotRepository>
+        <site>
+          <id>e2etrace.site</id>
+          <name>Projekt-Homepage</name>
+          <url>file:///D:/www/e2etrace</url>
+        </site>
+	  </distributionManagement>
+    </profile>
+
+    <profile>
+      <id>build-rel</id>   
+      <distributionManagement>
+        <repository>
+           <id>nexus.releases.upload</id>
+           <name>Nexus-Repository fuer Releases</name>
+           <url>
+             http://localhost:8081/nexus/content/repositories/releases
+           </url>
+        </repository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
+  <reporting>
+    <plugins>
+      <plugin>        
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>
+          maven-project-info-reports-plugin
+        </artifactId>
+        <version>2.1.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>project-team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <configLocation>
+            checkstyle-config.xml
+          </configLocation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>
+          surefire-report-maven-plugin
+        </artifactId>
+        <configuration>
+       </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
